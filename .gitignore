@@ -1,0 +1,11 @@
+# Ignore everything by default
+*
+
+# Keep ability to traverse directories
+!*/
+
+# Always keep the ignore file itself
+!.gitignore
+
+# Allow ONLY this folder (edit the path)
+!prompts/**
