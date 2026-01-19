@@ -1,0 +1,184 @@
+{
+  "initialize_project": true,
+  "include_optional": [],
+  "if_initialize_project_true_else_skip": [
+    {
+      "meta": {
+        "feature_name": "Python 3.11 FastAPI + PostgreSQL(pgvector) + Docker project scaffold with automatic device selection",
+        "goal": "Generate a production-ready, src-layout Python service with FastAPI, PostgreSQL + pgvector, Docker Compose, and a small utilities layer that auto-selects compute device with priority GPU -> MPS -> CPU.",
+        "non_goals": [
+          "Building a full ML training pipeline",
+          "Shipping a UI frontend",
+          "Implementing business-domain endpoints beyond healthcheck + example CRUD/vector demo"
+        ],
+        "deliverables_required": [
+          "Repo scaffold (src layout) with working FastAPI app",
+          "PostgreSQL + pgvector configured and reachable from app",
+          "Dockerfile + docker-compose.yml for app + db",
+          "SQLAlchemy models + Alembic migrations",
+          "Device auto-selection utility with GPU -> MPS -> CPU priority",
+          "CI-ready commands (lint, typecheck, tests), and Makefile or task runner",
+          "Comprehensive README with local + Docker run steps"
+        ],
+        "acceptance_criteria": [
+          "Running `docker compose up --build` starts API and DB; `/health` returns 200",
+          "App can create/read a sample entity and insert/query at least one vector row using pgvector",
+          "Device selection utility returns 'cuda' when CUDA is available, else 'mps' when available, else 'cpu'",
+          "Project follows src layout, uses Python 3.11, and has pinned dependencies",
+          "Code quality tools run successfully (format, lint, typecheck, tests)"
+        ],
+        "constraints": {
+          "python_version": "3.11",
+          "project_layout": "src",
+          "device_priority": ["cuda", "mps", "cpu"],
+          "database": "PostgreSQL",
+          "vector_extension": "pgvector",
+          "api_framework": "FastAPI",
+          "containerization": ["Docker", "Docker Compose"],
+          "server": {
+            "dev": "uvicorn",
+            "prod": ["gunicorn", "uvicorn.workers.UvicornWorker"]
+          }
+        }
+      },
+      "components": [
+        {
+          "component_name": "Platforms",
+          "prompt": "Implement automatic compute device selection with priority GPU -> MPS -> CPU. Provide a `src/<pkg>/platform/device.py` module that:\n- Detects NVIDIA CUDA via PyTorch if installed; if not installed, gracefully falls back to CPU unless MPS is available via PyTorch.\n- Detects Apple MPS via PyTorch on macOS.\n- Exposes `get_device()` returning a torch.device-like string ('cuda', 'mps', or 'cpu'), and `device_info()` returning a dict of capabilities.\n- Never crashes if torch is missing; in that case return 'cpu' and include a warning in device_info.\n- Include unit tests that monkeypatch torch availability to validate priority ordering.\n- Document usage in README.\n\nAlso add configuration flags:\n- ENV `FORCE_DEVICE` can override ('cuda'|'mps'|'cpu').\n- ENV `DISABLE_ACCELERATION=true` forces CPU.\n\nIf this project will later run embeddings/inference, include a placeholder `compute_backend.py` showing how to pass the selected device to model loading.",
+          "component_configuration": {
+            "device_priority": ["cuda", "mps", "cpu"],
+            "env_overrides": ["FORCE_DEVICE", "DISABLE_ACCELERATION"]
+          },
+          "component_inputs": {
+            "environment_variables": ["FORCE_DEVICE", "DISABLE_ACCELERATION"]
+          },
+          "component_outputs": {
+            "modules": [
+              "src/<pkg>/platform/device.py",
+              "src/<pkg>/platform/compute_backend.py"
+            ],
+            "tests": ["tests/test_device_selection.py"]
+          }
+        },
+        {
+          "component_name": "Runtime",
+          "prompt": "Scaffold a Python 3.11 project using modern industry standard conventions and a src layout.\n\nRequired structure:\n- `pyproject.toml` using a mainstream build backend (e.g. hatchling/poetry/setuptools) with pinned runtime deps ranges and pinned dev deps.\n- `src/<pkg>/` package with `__init__.py` and clear subpackages: `api/`, `db/`, `core/`, `platform/`.\n- `tests/` with pytest.\n- Tooling: black (or ruff format), ruff, mypy, pytest.\n- Add `pre-commit` config.\n- Add `.env.example`.\n- Add `Makefile` (or `justfile`) with common commands.\n- Add logging configuration.\n- Provide `.gitignore`.\n\nConfiguration management:\n- Use Pydantic Settings (pydantic-settings) for env-based config in `src/<pkg>/core/config.py`.\n- Provide `Settings` object including app name, environment, database URL, CORS, log level, and device flags.\n\nInclude a minimal but complete README: local run, docker run, migrations, tests.\n\nEnsure import paths and packaging work with src layout, and provide an example `python -m <pkg>` entry point or `uvicorn` module path.",
+          "component_configuration": {
+            "python_version": "3.11",
+            "layout": "src",
+            "quality_tools": ["ruff", "mypy", "pytest", "pre-commit"],
+            "config": "pydantic-settings"
+          },
+          "component_inputs": {
+            "project_name": "<replace_with_project_name>",
+            "package_name": "<replace_with_importable_package_name>"
+          },
+          "component_outputs": {
+            "files": [
+              "pyproject.toml",
+              "README.md",
+              ".pre-commit-config.yaml",
+              ".env.example",
+              "Makefile",
+              ".gitignore",
+              "src/<pkg>/**",
+              "tests/**"
+            ]
+          }
+        },
+        {
+          "component_name": "PostgreSQL",
+          "prompt": "Set up PostgreSQL with SQLAlchemy and pgvector.\n\nRequirements:\n- Use SQLAlchemy 2.x style engine/session.\n- Provide `src/<pkg>/db/session.py` with engine creation and session dependency for FastAPI.\n- Provide `src/<pkg>/db/base.py` and `src/<pkg>/db/models.py` with at least:\n  - A sample table `items` (id, name, created_at)\n  - A vector table `embeddings` (id, item_id FK, embedding VECTOR(<dim>), created_at)\n- Use Alembic for migrations; include initial migration that:\n  - Enables pgvector extension (`CREATE EXTENSION IF NOT EXISTS vector;`)\n  - Creates tables.\n- Add repository/DAO layer `src/<pkg>/db/repo.py` with:\n  - Insert item\n  - Insert embedding\n  - Similarity search using pgvector operators (cosine distance or L2).\n- Add tests that run against a real Postgres in Docker (compose test service) OR provide lightweight integration test instructions.\n\nDB configuration:\n- Use `DATABASE_URL` env var, plus compose defaults.\n- Provide a `docker-compose.yml` Postgres service with volume + healthcheck.\n\nNotes:\n- Keep vector dimension configurable via env `EMBEDDING_DIM` with default (e.g. 768).",
+          "component_configuration": {
+            "extensions": ["SQLAlchemy", "pgvector"],
+            "migrations": "alembic",
+            "env": ["DATABASE_URL", "EMBEDDING_DIM"]
+          },
+          "component_inputs": {
+            "environment_variables": ["DATABASE_URL", "EMBEDDING_DIM"]
+          },
+          "component_outputs": {
+            "modules": [
+              "src/<pkg>/db/session.py",
+              "src/<pkg>/db/base.py",
+              "src/<pkg>/db/models.py",
+              "src/<pkg>/db/repo.py"
+            ],
+            "migrations": ["alembic.ini", "alembic/**"]
+          }
+        },
+        {
+          "component_name": "FastAPI",
+          "prompt": "Set up FastAPI service with Uvicorn for dev and Gunicorn for production.\n\nRequirements:\n- App factory in `src/<pkg>/api/app.py`.\n- Routers:\n  - `/health` GET returns status + environment + device_info.\n  - `/items` POST/GET for sample CRUD.\n  - `/embeddings` POST to store embedding for item.\n  - `/search` POST to perform vector similarity search and return top-k.\n- Use dependency injection for DB sessions.\n- Add CORS configuration driven by settings.\n- Add OpenAPI metadata and tags.\n- Error handling: global exception handler for DB errors.\n- Provide `src/<pkg>/main.py` (or equivalent) for `uvicorn <pkg>.main:app`.\n\nSecurity basics:\n- Add request size limit note and proxy headers support guidance.\n- Provide optional API key auth scaffold (disabled by default), controlled by env.\n\nTesting:\n- Add FastAPI TestClient tests for health and at least one CRUD route.",
+          "component_configuration": {
+            "extensions": ["Uvicorn", "Gunicorn"],
+            "routers": ["/health", "/items", "/embeddings", "/search"],
+            "optional_security": ["API_KEY_AUTH"]
+          },
+          "component_inputs": {
+            "environment_variables": ["CORS_ORIGINS", "API_KEY_ENABLED", "API_KEY"]
+          },
+          "component_outputs": {
+            "modules": [
+              "src/<pkg>/api/app.py",
+              "src/<pkg>/api/routes/health.py",
+              "src/<pkg>/api/routes/items.py",
+              "src/<pkg>/api/routes/embeddings.py",
+              "src/<pkg>/api/routes/search.py",
+              "src/<pkg>/main.py"
+            ],
+            "tests": ["tests/test_api_health.py", "tests/test_api_items.py"]
+          }
+        },
+        {
+          "component_name": "Docker",
+          "prompt": "Containerize the application and database using Docker and Docker Compose.\n\nRequirements:\n- `Dockerfile` for the API:\n  - Multi-stage build if reasonable.\n  - Uses Python 3.11 slim.\n  - Installs system deps needed for psycopg/psycopg2 and builds wheels.\n  - Runs as non-root user.\n- `docker-compose.yml`:\n  - Services: `api`, `db`.\n  - `db` uses official postgres image and installs/activates pgvector (either via a pgvector-enabled image or init script).\n  - Healthchecks for db and api.\n  - Environment wiring via `.env`.\n  - Volumes for db persistence.\n- Provide `docker/` scripts:\n  - `docker/db/init.sql` to create extension vector.\n  - `docker/api/entrypoint.sh` to run migrations then start server.\n- Production mode:\n  - `gunicorn -k uvicorn.workers.UvicornWorker` config.\n  - Expose port 8000.\n\nDeveloper experience:\n- Compose profiles or separate override for dev hot-reload (optional).\n- Document commands in README.",
+          "component_configuration": {
+            "extensions": ["Docker Compose"],
+            "services": ["api", "db"],
+            "ports": { "api": 8000, "db": 5432 }
+          },
+          "component_inputs": {
+            "environment_variables": [
+              "DATABASE_URL",
+              "POSTGRES_USER",
+              "POSTGRES_PASSWORD",
+              "POSTGRES_DB"
+            ]
+          },
+          "component_outputs": {
+            "files": [
+              "Dockerfile",
+              "docker-compose.yml",
+              "docker/db/init.sql",
+              "docker/api/entrypoint.sh"
+            ]
+          }
+        }
+      ],
+      "implementation_notes": {
+        "dependency_suggestions": {
+          "api": ["fastapi", "uvicorn[standard]", "gunicorn"],
+          "db": ["sqlalchemy>=2", "psycopg[binary]", "alembic", "pgvector"],
+          "config": ["pydantic>=2", "pydantic-settings"],
+          "quality": ["ruff", "mypy", "pytest", "pytest-cov", "httpx", "pre-commit"],
+          "optional_ml": ["torch (optional, not hard dependency)"]
+        },
+        "recommended_env_files": [
+          ".env.example",
+          ".env (local, gitignored)"
+        ],
+        "commands_required_in_readme": [
+          "make install",
+          "make dev",
+          "make test",
+          "docker compose up --build",
+          "alembic upgrade head"
+        ]
+      }
+    }
+  ],
+  "if_initialize_project_false_else_skip": [
+    {}
+  ]
+}
