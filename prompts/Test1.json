@@ -1,0 +1,54 @@
+{
+    "initialize_project": true,
+    "include_optional": [],
+    "if_initialize_project_true_else_skip": [
+        {
+            "components":[
+                {
+                    "component_name": "Platforms",
+                    "prompt": "Add support to utilize CPU/MPS and GPU automatically. Priority: GPU -> MPS -> CPU.",
+                    "component_configuration": {},
+                    "component_inputs":{},
+                    "component_outputs":{}
+                },
+                {
+                    "component_name": "Runtime",
+                    "prompt": "Set up Python 3.11 project according to software industry standard. Adjust project structure to src layout.",
+                    "component_configuration": {},
+                    "component_inputs":{},
+                    "component_outputs":{}
+                },
+                {
+                    "component_name": "PostgreSQL",
+                    "prompt": "Set up PostgreSQL on the project.",
+                    "component_configuration": {
+                        "extensions": ["SQLAlchemy","pgvector"]
+                    },
+                    "component_inputs":{},
+                    "component_outputs":{}
+                },
+                {
+                    "component_name": "FastAPI",
+                    "prompt": "Set up FastAPI on the project.",
+                    "component_configuration": {
+                        "extensions": ["Uvicorn", "Gunicorn"]
+                    },
+                    "component_inputs":{},
+                    "component_outputs":{}
+                },
+                {
+                    "component_name": "Docker",
+                    "prompt": "Set up Docker on the project.",
+                    "component_configuration": {
+                        "extensions": ["Docker Compose"]
+                    },
+                    "component_inputs":{},
+                    "component_outputs":{}
+                }
+            ]
+        }
+    ],
+    "if_initialize_project_false_else_skip": [
+        {}
+    ]
+}

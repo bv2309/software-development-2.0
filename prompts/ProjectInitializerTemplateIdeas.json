@@ -1,0 +1,42 @@
+{
+    "initialize_project": null, /* null or true or false (select one, if null you get to skip both) */
+    "include_optional": ["",""], /* this is the full list of features you want to include in the project */
+    "if_initialize_project_true_else_skip": [
+        {
+            "components":[
+                {
+                    "component_name": "Platforms",
+                    "prompt": "Add support to utilize CPU/MPS and GPU automatically. Priority: GPU -> MPS -> CPU",
+                    "component_configuration": {},
+                    "component_inputs":{},
+                    "component_outputs":{}
+                },
+                {
+                    "component_name": "Runtime",
+                    "prompt": "Set up Python 3.11 project according to software industry standard. Adjust project structure to src layout.",
+                    "component_configuration": {},
+                    "component_inputs":{},
+                    "component_outputs":{}
+                },
+                {
+                    "component_name": "PostgreSQL",
+                    "prompt": "Set up PostgreSQL on the project.",
+                    "component_configuration": {
+                        "plugins": ["pgvector"],
+                        "pgvector": {
+                            "key": "value"
+                        }
+                    },
+                    "component_inputs":{
+                        "key": "value",
+                        "example_number": "USER_INPUT"
+                    } 
+                }
+            ]
+        }
+    ],
+    "if_initialize_project_false_else_skip": [
+        {},
+        {}
+    ]
+}
