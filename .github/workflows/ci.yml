@@ -1,0 +1,29 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install uv
+        run: pip install uv
+      - name: Install deps
+        run: uv pip install --system ".[dev]"
+      - name: Generate gRPC stubs
+        if: env.ENABLE_GRPC == 'true'
+        run: bash scripts/generate_grpc.sh
+      - name: Ruff
+        run: ruff check src tests
+      - name: Ruff format
+        run: ruff format --check src tests
+      - name: Mypy
+        run: mypy src
+      - name: Pytest
+        run: pytest

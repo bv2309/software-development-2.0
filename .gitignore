@@ -1,11 +1,31 @@
-# Ignore everything by default
-*
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+.eggs/
 
-# Keep ability to traverse directories
-!*/
+# Virtual environments
+.venv/
+.venv*/
 
-# Always keep the ignore file itself
-!.gitignore
+# Tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
 
-# Allow ONLY this folder (edit the path)
-!prompts/**
+# Build artifacts
+build/
+dist/
+
+# IDE
+.vscode/
+.idea/
+
+# Env
+.env
+
+# OS
+.DS_Store

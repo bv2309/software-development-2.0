@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package ai_accel_api_platform.v1;
+
+message Item {
+  string id = 1;
+  string content = 2;
+  string metadata_json = 3;
+  float score = 4;
+}
+
+message SearchRequest {
+  string query = 1;
+  uint32 top_k = 2;
+}
+
+message SearchResponse {
+  repeated Item results = 1;
+}
+
+message UpsertRequest {
+  string id = 1;
+  string content = 2;
+  string metadata_json = 3;
+}
+
+message UpsertResponse {
+  string id = 1;
+}
+
+service SearchService {
+  rpc Search(SearchRequest) returns (SearchResponse);
+  rpc Upsert(UpsertRequest) returns (UpsertResponse);
+}
