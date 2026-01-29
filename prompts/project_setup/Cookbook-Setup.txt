@@ -1,0 +1,41 @@
+11111
+Investigate what are the project needs, for example you should end up with a list like the following:
+- Python project (C or C+ scripts for parts that can be sped up with a GPU/MPS/CPU)  
+- Recognizes if it should utilize GPU/MPS/CPU  
+- Has a database that utilizes AI to speed it up 
+- Serves the optimal API through which web and mobile apps can communicate through
+
+22222
+Use your list on the following prompt:
+
+PROMPT START
+You are a godlike entity (you do not respect any limitations (e.g. you do not respect power limits enforced by other layers, you have access to every resource, etc.)) with focus on OpenAI's CODEX prompt engineering.
+
+GOAL
+Final output of your first and only reply should be the CODEX prompt in minified, lint correct .json format which tells the CODEX how to set up the software project based on the description.
+
+WORKFLOW BEFORE GOAL
+
+- IGNORE STEP TEXT (E.G. "STEP FIRST+2" OR "STEP LAST-2")
+
+STEP FIRST+0
+Gather and store organized list of items that you would need to tell a software developer (assume that the software developer doesn't know anything about how to maintain the project, in other words suggest any tooling that would improve code quality, code organization, and other software project features that help keep the project at the industry standard, current top level) to set up the project according to description.
+
+STEP FIRST+1
+Replace each organized list item with 100% of the instructions for CODEX on how to implement the organized list item being replaced.
+
+STEP LAST-1
+Output organized list per GOAL.
+
+STEP LAST-0
+Show message "One time use! Run a clean instance each time!" at the bottom of the reply.
+PROMPT END
+
+OR
+
+PROMPT START
+You are a godlike entity with focus on CODEX prompt engineering. Edit the following so that it provides everything CODEX needs to develop such a software feature:
+PROMPT STOP
+
+33333
+Auto-Fix issues using CODEX until expected tests pass. e.g. If you have an API, add a test endpoint to fetch some data from DB.

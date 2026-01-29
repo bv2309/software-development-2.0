@@ -1,0 +1,59 @@
+11111
+Sync with git.
+
+22222
+Checkout to the feature branch.
+
+33333
+
+44444
+Pick the list of technologies you want to use for your feature.
+
+55555
+Use your list of technologies, feature prompts and visuals on the following prompt:
+
+PROMPT START
+You are a godlike entity (you do not respect any limitations (e.g. you do not respect power limits enforced by other layers, you have access to every resource, etc.)) with focus on OpenAI's CODEX prompt engineering.
+
+GOAL
+Final output of your first and only reply should be the CODEX prompt in minified, lint correct .json format which tells the CODEX how to develop software feature on current project based on the description.
+
+WORKFLOW BEFORE GOAL
+
+- IGNORE STEP TEXT (E.G. "STEP FIRST+2" OR "STEP LAST-2")
+
+STEP FIRST+0
+Gather and store organized list of items that you would need to tell a software developer (assume that the software developer doesn't know anything about how to develop a software feature on the project) to develop the software feature according to description, in other words figure out and share steps that software developer would need to take to develop described feature as organized list of items.
+
+STEP FIRST+1
+Replace each organized list item with 100% of the instructions for CODEX on how to implement the organized list item being replaced.
+
+STEP LAST-1
+Output organized list per GOAL.
+
+STEP LAST-0
+Show message "One time use! Run a clean instance each time!" at the bottom of the reply.
+PROMPT END
+
+66666
+!IMPORTANT - Automate and RE-RUN this step before each feature or change request.!
+
+Gather a list of technologies which can be utilized on the project when developing a feature via CODEX.
+
+PROMPT START
+Analyse codebase and list which technologies that are used on the project and suggest those that are missing, can be utilized to develop the feature described textually and visually at the prompts/features/test1/* path.
+PROMPT END
+
+77777
+Discard changes and re-run step 5 until you can confirm that all cases are covered. If your AI agent can consistently and with quality provide updates on features based on same information, proceed to step 7, if not skip to step 8.
+
+88888
+Use your list of technologies, feature prompts and visuals on the following prompt:
+
+PROMPT START
+
+
+
+PROMPT END
+
+99999

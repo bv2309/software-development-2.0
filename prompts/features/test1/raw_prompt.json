@@ -1,0 +1,40 @@
+{
+    "feature_details": [
+        {
+            "database_table_columns": ["user.first_name", "user.last_name"]
+        },
+        {
+            "api_name": "CoreAPI",
+            "api_endpoint_or_queried_object": "user",
+            "api_endpoint_or_queried_object_interaction_type": "GET_DATA",
+            "response_fields": ["full_name"],
+            "request_parameters": null,
+            "response_codes_and_messages": [
+                {
+                    "expected_response_code": "200",
+                    "in_case": "When everything went fine with the request.",
+                    "message": "You've successfully fetched user object."
+                },
+                {
+                    "expected_response_code": "400",
+                    "in_case": "When something went wrong.",
+                    "message": "System failed to retrieve the data."
+                }
+
+            ]
+        },
+        {
+            "logic_behind_api_response_fields": {
+                "full_name": "Joined user.first_name and user.last_name. Format: user.first_name + space + user.last_name"
+            },
+            "logic_behind_api_request_parameters": {
+
+            }
+        }
+    ],
+    "global_enums": [
+        {
+            "api_endpoint_or_queried_object_interaction_type":["GET_DATA", "SEND_DATA"]
+        }
+    ]
+}
