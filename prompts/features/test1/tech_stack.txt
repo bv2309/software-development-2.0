@@ -1,0 +1,19 @@
+Language/runtime: Python 3.12 (pyproject.toml)
+API framework: FastAPI + Uvicorn, Starlette (main.py)
+Data validation: Pydantic + pydantic-settings (schemas.py, settings.py)
+Database: PostgreSQL (pgvector), async SQLAlchemy, Alembic migrations (src/ai_accel_api_platform/db/*, 0001_initial.py, docker-compose.yml)
+Caching/queues: Redis + RQ (session.py, src/ai_accel_api_platform/workers/*)
+Auth/security: JWT (python-jose), passlib[bcrypt], OAuth2PasswordBearer (security.py)
+ML stack: sentence-transformers, torch, numpy (src/ai_accel_api_platform/ai/*)
+Observability: structlog, prometheus-client, optional OpenTelemetry (logging.py, src/ai_accel_api_platform/telemetry/*)
+gRPC: proto + optional grpc server (search.proto, grpc_server.py)
+Tooling: uv, ruff, mypy, pytest (Makefile, pyproject.toml)
+Containerization: Docker + docker compose (Dockerfile, docker-compose.yml)
+Optional C++ extension: pybind11/cmake (src/ai_accel_api_platform/cpp)
+Missing/needed for the user full_name feature
+
+DB schema fields: users.first_name and users.last_name do not exist; add via Alembic migration and update the SQLAlchemy User model. (models.py, 0001_initial.py)
+API endpoint: no user read endpoint exists; add a FastAPI route (e.g., GET /v1/user or /v1/users/me) and include its router. Use get_current_user so it matches the “logged-in user data” flowchart. (__init__.py, deps.py)
+Response schema: no full_name response model or “message” envelope; add a Pydantic model (and message field if you want to follow the compiled prompt). (schemas.py)
+Enum: api_endpoint_or_queried_object_interaction_type isn’t defined; implement via stdlib enum.Enum or typing.Literal (no new dependency).
+Tests/docs: add pytest tests for name composition + endpoint responses and update README/docs to describe the new API contract.
