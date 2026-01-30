@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from typing import Any, Tuple
+from typing import Any
 
 import torch
 
 
-def get_best_device(prefer_gpu: bool = True) -> Tuple[torch.device, str]:
+def get_best_device(prefer_gpu: bool = True) -> tuple[torch.device, str]:
     if prefer_gpu and torch.cuda.is_available():
         return torch.device("cuda"), "cuda"
     if prefer_gpu and torch.backends.mps.is_available():

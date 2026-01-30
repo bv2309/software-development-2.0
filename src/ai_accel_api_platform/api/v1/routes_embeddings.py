@@ -11,9 +11,6 @@ router = APIRouter()
 
 @router.post("/embeddings", response_model=EmbeddingResponse)
 async def create_embeddings(payload: EmbeddingRequest) -> EmbeddingResponse:
-    if payload.texts:
-        texts = payload.texts
-    else:
-        texts = [payload.text or ""]
+    texts = payload.texts if payload.texts else [payload.text or ""]
     embeddings = await run_in_threadpool(embed_texts, texts)
     return EmbeddingResponse(embeddings=embeddings)

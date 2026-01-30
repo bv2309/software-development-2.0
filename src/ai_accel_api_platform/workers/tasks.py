@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-from typing import Any, Optional
+from typing import Any
 from uuid import UUID
 
 from ai_accel_api_platform.ai.embeddings import embed_texts
@@ -13,7 +13,7 @@ from ai_accel_api_platform.db.vector import bump_cache_namespace
 def compute_and_store_embedding(
     item_id: str,
     content: str,
-    metadata: Optional[dict[str, Any]],
+    metadata: dict[str, Any] | None,
 ) -> str:
     embedding = embed_texts([content])[0]
 

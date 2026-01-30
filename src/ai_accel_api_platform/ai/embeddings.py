@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import threading
-from typing import Iterable
+from collections.abc import Iterable
+from typing import Any, cast
 
 import numpy as np
-from sentence_transformers import SentenceTransformer
 import structlog
 import torch
+from sentence_transformers import SentenceTransformer
 
 from ai_accel_api_platform.core.device import get_best_device
 from ai_accel_api_platform.settings import get_settings
@@ -17,14 +18,20 @@ _embedder: SentenceTransformer | None = None
 _embedder_lock = threading.Lock()
 
 
-def _maybe_quantize(model: SentenceTransformer, enable: bool, device_type: str) -> SentenceTransformer:
+def _maybe_quantize(
+    model: SentenceTransformer, enable: bool, device_type: str
+) -> SentenceTransformer:
     if not enable:
         return model
     if device_type != "cpu":
         logger.info("quantization_skipped", reason="non_cpu")
         return model
     try:
-        model = torch.quantization.quantize_dynamic(model, {torch.nn.Linear}, dtype=torch.qint8)
+        quantization = cast(Any, torch.quantization)
+        model = cast(
+            SentenceTransformer,
+            quantization.quantize_dynamic(model, {torch.nn.Linear}, dtype=torch.qint8),
+        )
         logger.info("quantization_enabled")
     except Exception as exc:
         logger.warning("quantization_failed", error=str(exc))
@@ -38,7 +45,8 @@ def _maybe_compile(model: SentenceTransformer, enable: bool) -> SentenceTransfor
         logger.info("torch_compile_unavailable")
         return model
     try:
-        model = torch.compile(model)
+        compile_fn = cast(Any, torch.compile)
+        model = cast(SentenceTransformer, compile_fn(model))
         logger.info("torch_compile_enabled")
     except Exception as exc:
         logger.warning("torch_compile_failed", error=str(exc))
@@ -68,12 +76,12 @@ def embed_texts(texts: Iterable[str]) -> list[list[float]]:
     settings = get_settings()
     model = get_embedder()
     with torch.no_grad():
-        embeddings = model.encode(
+        embeddings: Any = model.encode(
             list(texts),
             batch_size=settings.embed_batch_size,
             convert_to_numpy=True,
             normalize_embeddings=True,
         )
     if isinstance(embeddings, np.ndarray):
-        return embeddings.tolist()
-    return [emb.tolist() for emb in embeddings]
+        return cast(list[list[float]], embeddings.tolist())
+    return [cast(list[float], emb.tolist()) for emb in cast(Iterable[np.ndarray], embeddings)]

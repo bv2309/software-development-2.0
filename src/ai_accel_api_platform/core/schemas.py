@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Any, List, Optional
+from enum import Enum
+from typing import Any
 from uuid import UUID
 
 from pydantic import BaseModel, Field, model_validator
@@ -12,52 +13,57 @@ class HealthResponse(BaseModel):
     db_ok: bool
 
 
+class ApiEndpointOrQueriedObjectInteractionType(str, Enum):
+    GET_DATA = "GET_DATA"
+    SEND_DATA = "SEND_DATA"
+
+
 class ItemCreate(BaseModel):
-    id: Optional[UUID] = None
+    id: UUID | None = None
     content: str
-    metadata: Optional[dict[str, Any]] = None
+    metadata: dict[str, Any] | None = None
     async_embedding: bool = False
 
 
 class ItemRead(BaseModel):
     id: UUID
     content: str
-    metadata: Optional[dict[str, Any]] = None
+    metadata: dict[str, Any] | None = None
     has_embedding: bool
 
 
 class EmbeddingRequest(BaseModel):
-    text: Optional[str] = None
-    texts: Optional[List[str]] = None
+    text: str | None = None
+    texts: list[str] | None = None
 
     @model_validator(mode="after")
-    def validate_payload(self) -> "EmbeddingRequest":
+    def validate_payload(self) -> EmbeddingRequest:
         if not self.text and not self.texts:
             raise ValueError("text or texts must be provided")
         return self
 
 
 class EmbeddingResponse(BaseModel):
-    embeddings: List[List[float]]
+    embeddings: list[list[float]]
 
 
 class SearchRequest(BaseModel):
     query: str
     top_k: int = Field(default=5, ge=1, le=100)
-    filters: Optional[dict[str, Any]] = None
-    text_filter: Optional[str] = None
+    filters: dict[str, Any] | None = None
+    text_filter: str | None = None
     use_hybrid: bool = False
 
 
 class SearchResult(BaseModel):
     id: UUID
     content: str
-    metadata: Optional[dict[str, Any]]
+    metadata: dict[str, Any] | None
     score: float
 
 
 class SearchResponse(BaseModel):
-    results: List[SearchResult]
+    results: list[SearchResult]
 
 
 class Token(BaseModel):
@@ -78,3 +84,12 @@ class UserRead(BaseModel):
     id: UUID
     username: str
     is_active: bool
+
+
+class UserFullNameResponse(BaseModel):
+    message: str
+    full_name: str
+
+
+class ErrorResponse(BaseModel):
+    message: str

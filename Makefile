@@ -1,4 +1,4 @@
-.PHONY: fmt lint typecheck test up down worker build-cpp
+.PHONY: fmt lint typecheck test ci up down worker build-cpp
 
 CMAKE_ARGS ?=
 
@@ -14,8 +14,12 @@ typecheck:
 test:
 	PYTHONPATH=src pytest
 
+ci:
+	bash scripts/ci_local.sh
+
 up:
-	docker compose up -d
+	bash scripts/ci_local.sh
+	docker compose up -d --build
 
 down:
 	docker compose down

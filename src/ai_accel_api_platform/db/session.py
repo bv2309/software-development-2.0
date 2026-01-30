@@ -1,18 +1,24 @@
 from __future__ import annotations
 
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 from redis import Redis
 from redis.asyncio import Redis as AsyncRedis
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 
 from ai_accel_api_platform.settings import get_settings
 
 _engine: AsyncEngine | None = None
 _sessionmaker: async_sessionmaker[AsyncSession] | None = None
-_redis: AsyncRedis | None = None
-_redis_sync: Redis | None = None
+_redis: AsyncRedis[str] | None = None
+_redis_sync: Redis[str] | None = None
 
 
 def get_engine() -> AsyncEngine:
@@ -37,8 +43,8 @@ def get_sessionmaker() -> async_sessionmaker[AsyncSession]:
 
 
 @asynccontextmanager
-async def get_session() -> AsyncSession:
-    session = get_sessionmaker()()
+async def get_session() -> AsyncIterator[AsyncSession]:
+    session: AsyncSession = get_sessionmaker()()
     try:
         yield session
     finally:
@@ -54,7 +60,7 @@ async def db_ping() -> bool:
         return False
 
 
-def get_redis() -> AsyncRedis:
+def get_redis() -> AsyncRedis[str]:
     global _redis
     if _redis is None:
         settings = get_settings()
@@ -62,7 +68,7 @@ def get_redis() -> AsyncRedis:
     return _redis
 
 
-def get_sync_redis() -> Redis:
+def get_sync_redis() -> Redis[str]:
     global _redis_sync
     if _redis_sync is None:
         settings = get_settings()

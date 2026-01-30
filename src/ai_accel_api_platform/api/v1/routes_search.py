@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Annotated
+
 from fastapi import APIRouter, Depends
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -20,10 +22,10 @@ router = APIRouter()
 @router.post("/search", response_model=SearchResponse)
 async def search(
     payload: SearchRequest,
-    session: AsyncSession = Depends(get_db_session),
+    session: Annotated[AsyncSession, Depends(get_db_session)],
 ) -> SearchResponse:
     settings = get_settings()
-    redis: Redis | None = None
+    redis: Redis[str] | None = None
     cache_key = None
     try:
         redis = get_redis()

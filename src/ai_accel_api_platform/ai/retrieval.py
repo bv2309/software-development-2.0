@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Iterable
+from collections.abc import Iterable
 
 from ai_accel_api_platform.core.utils import batch_cosine_similarity
 

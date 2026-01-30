@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import structlog
+from fastapi import FastAPI
 
 logger = structlog.get_logger(__name__)
 
 
-def setup_tracing(app) -> None:
+def setup_tracing(app: FastAPI) -> None:
     try:
         from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
         from opentelemetry.sdk.trace import TracerProvider

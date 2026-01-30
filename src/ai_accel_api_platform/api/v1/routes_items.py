@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from typing import Annotated
 from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -21,7 +22,7 @@ router = APIRouter()
 @router.post("/items", response_model=ItemRead)
 async def upsert_item(
     payload: ItemCreate,
-    session: AsyncSession = Depends(get_db_session),
+    session: Annotated[AsyncSession, Depends(get_db_session)],
 ) -> ItemRead:
     item_id = payload.id or uuid4()
 
@@ -68,7 +69,7 @@ async def upsert_item(
 @router.get("/items/{item_id}", response_model=ItemRead)
 async def read_item(
     item_id: UUID,
-    session: AsyncSession = Depends(get_db_session),
+    session: Annotated[AsyncSession, Depends(get_db_session)],
 ) -> ItemRead:
     item = await get_item(session, item_id)
     if item is None:

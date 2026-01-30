@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from fastapi import HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+
 from ai_accel_api_platform.settings import get_settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -15,23 +16,25 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/v1/auth/token")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+    return bool(pwd_context.verify(plain_password, hashed_password))
 
 
 def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
+    return str(pwd_context.hash(password))
 
 
 def create_access_token(subject: str, expires_minutes: int = 60) -> str:
     settings = get_settings()
-    expire = datetime.now(tz=timezone.utc) + timedelta(minutes=expires_minutes)
+    expire = datetime.now(tz=UTC) + timedelta(minutes=expires_minutes)
     to_encode = {"sub": subject, "exp": expire}
-    return jwt.encode(to_encode, settings.jwt_secret, algorithm=settings.jwt_alg)
+    token: str = jwt.encode(to_encode, settings.jwt_secret, algorithm=settings.jwt_alg)
+    return token
 
 
 def decode_access_token(token: str) -> dict[str, Any]:
     settings = get_settings()
-    return jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_alg])
+    payload: dict[str, Any] = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_alg])
+    return payload
 
 
 def credentials_exception() -> HTTPException:

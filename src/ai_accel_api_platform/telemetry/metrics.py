@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import time
-from typing import Callable
+from collections.abc import Awaitable, Callable
 
 from fastapi import APIRouter, Request
 from fastapi.responses import Response
@@ -28,7 +28,9 @@ def metrics() -> Response:
 
 
 class MetricsMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next: Callable):
+    async def dispatch(
+        self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
+    ) -> Response:
         start = time.perf_counter()
         response = await call_next(request)
         duration = time.perf_counter() - start

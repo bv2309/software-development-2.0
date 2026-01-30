@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import structlog
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import structlog
 
 from ai_accel_api_platform.api.middleware import (
     RateLimitMiddleware,
@@ -12,11 +12,12 @@ from ai_accel_api_platform.api.middleware import (
 from ai_accel_api_platform.api.v1 import router as v1_router
 from ai_accel_api_platform.db.repositories import ensure_default_user
 from ai_accel_api_platform.db.session import get_session
+from ai_accel_api_platform.grpc_server import start_grpc_server
 from ai_accel_api_platform.logging import configure_logging
 from ai_accel_api_platform.settings import get_settings
-from ai_accel_api_platform.telemetry.metrics import MetricsMiddleware, router as metrics_router
+from ai_accel_api_platform.telemetry.metrics import MetricsMiddleware
+from ai_accel_api_platform.telemetry.metrics import router as metrics_router
 from ai_accel_api_platform.telemetry.tracing import setup_tracing
-from ai_accel_api_platform.grpc_server import start_grpc_server
 
 logger = structlog.get_logger(__name__)
 
@@ -58,6 +59,8 @@ def create_app() -> FastAPI:
                     session,
                     settings.default_admin_username,
                     settings.default_admin_password,
+                    settings.default_admin_first_name,
+                    settings.default_admin_last_name,
                 )
         except Exception as exc:
             logger.warning("default_user_init_failed", error=str(exc))

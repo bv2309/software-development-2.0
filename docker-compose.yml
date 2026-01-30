@@ -48,5 +48,19 @@ services:
       redis:
         condition: service_healthy
 
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${DEFAULT_ADMIN_USERNAME}
+      PGADMIN_DEFAULT_PASSWORD: ${DEFAULT_ADMIN_PASSWORD}
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
   pgdata:
+  pgadmin_data:

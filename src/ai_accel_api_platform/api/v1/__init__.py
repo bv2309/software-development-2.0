@@ -8,6 +8,7 @@ from ai_accel_api_platform.api.v1 import (
     routes_health,
     routes_items,
     routes_search,
+    routes_user,
 )
 
 router = APIRouter()
@@ -16,3 +17,4 @@ router.include_router(routes_items.router, tags=["items"])
 router.include_router(routes_embeddings.router, tags=["embeddings"])
 router.include_router(routes_search.router, tags=["search"])
 router.include_router(routes_auth.router, tags=["auth"])
+router.include_router(routes_user.router, tags=["user"])

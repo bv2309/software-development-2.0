@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import asyncio
+import importlib
 import threading
+from typing import TYPE_CHECKING, Any, cast
 
 import structlog
 
@@ -10,12 +12,18 @@ from ai_accel_api_platform.settings import get_settings
 logger = structlog.get_logger(__name__)
 
 
-def _load_grpc_modules():
+def _load_grpc_modules() -> tuple[Any, Any, Any] | None:
     try:
-        import grpc  # type: ignore
-        from ai_accel_api_platform.grpc import search_pb2, search_pb2_grpc
+        import grpc
+
+        search_pb2 = cast(Any, importlib.import_module("ai_accel_api_platform.grpc.search_pb2"))
+        search_pb2_grpc = cast(
+            Any, importlib.import_module("ai_accel_api_platform.grpc.search_pb2_grpc")
+        )
     except Exception as exc:
-        logger.warning("grpc_disabled", reason="grpc_not_installed_or_stubs_missing", error=str(exc))
+        logger.warning(
+            "grpc_disabled", reason="grpc_not_installed_or_stubs_missing", error=str(exc)
+        )
         return None
     return grpc, search_pb2, search_pb2_grpc
 
@@ -28,11 +36,19 @@ def start_grpc_server() -> None:
     grpc, search_pb2, search_pb2_grpc = modules
     settings = get_settings()
 
-    class SearchService(search_pb2_grpc.SearchServiceServicer):
-        async def Search(self, request, context):
+    if TYPE_CHECKING:
+
+        class SearchServiceBase:
+            pass
+
+    else:
+        SearchServiceBase = search_pb2_grpc.SearchServiceServicer
+
+    class SearchService(SearchServiceBase):
+        async def Search(self, request: Any, context: Any) -> Any:
             return search_pb2.SearchResponse(results=[])
 
-        async def Upsert(self, request, context):
+        async def Upsert(self, request: Any, context: Any) -> Any:
             return search_pb2.UpsertResponse(id=request.id)
 
     async def serve() -> None:

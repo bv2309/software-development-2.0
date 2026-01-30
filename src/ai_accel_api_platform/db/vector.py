@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from redis.asyncio import Redis
 
@@ -13,8 +13,8 @@ def build_search_cache_key(
     namespace: str,
     query: str,
     top_k: int,
-    filters: Optional[dict[str, Any]],
-    text_filter: Optional[str],
+    filters: dict[str, Any] | None,
+    text_filter: str | None,
 ) -> str:
     normalized_filters = normalize_filters(filters)
     parts = [
@@ -27,13 +27,13 @@ def build_search_cache_key(
     return cache_key("search", parts)
 
 
-async def get_cache_namespace(redis: Redis) -> str:
-    namespace = await redis.get(CACHE_NAMESPACE_KEY)
+async def get_cache_namespace(redis: Redis[str]) -> str:
+    namespace: str | None = await redis.get(CACHE_NAMESPACE_KEY)
     if namespace is None:
         namespace = "1"
         await redis.set(CACHE_NAMESPACE_KEY, namespace)
     return namespace
 
 
-async def bump_cache_namespace(redis: Redis) -> None:
+async def bump_cache_namespace(redis: Redis[str]) -> None:
     await redis.incr(CACHE_NAMESPACE_KEY)

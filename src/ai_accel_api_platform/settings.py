@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from functools import lru_cache
-from typing import List
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -36,9 +35,7 @@ class Settings(BaseSettings):
     enable_grpc: bool = Field(default=False, alias="ENABLE_GRPC")
     grpc_port: int = Field(default=50051, alias="GRPC_PORT")
     enable_rerank: bool = Field(default=False, alias="ENABLE_RERANK")
-    rerank_model: str = Field(
-        default="cross-encoder/ms-marco-MiniLM-L-6-v2", alias="RERANK_MODEL"
-    )
+    rerank_model: str = Field(default="cross-encoder/ms-marco-MiniLM-L-6-v2", alias="RERANK_MODEL")
 
     enable_tracing: bool = Field(default=False, alias="ENABLE_TRACING")
 
@@ -50,13 +47,15 @@ class Settings(BaseSettings):
 
     default_admin_username: str = Field(default="admin", alias="DEFAULT_ADMIN_USERNAME")
     default_admin_password: str = Field(default="admin", alias="DEFAULT_ADMIN_PASSWORD")
+    default_admin_first_name: str = Field(default="Branimir", alias="DEFAULT_ADMIN_FIRST_NAME")
+    default_admin_last_name: str = Field(default="Viljevac", alias="DEFAULT_ADMIN_LAST_NAME")
 
     db_pool_size: int = Field(default=5, alias="DB_POOL_SIZE")
     db_max_overflow: int = Field(default=10, alias="DB_MAX_OVERFLOW")
     db_pool_timeout: int = Field(default=30, alias="DB_POOL_TIMEOUT")
 
     @property
-    def cors_origins(self) -> List[str]:
+    def cors_origins(self) -> list[str]:
         value = self.cors_origins_raw
         if value.strip() == "*":
             return ["*"]
