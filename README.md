@@ -1,3 +1,5 @@
+# Idea deprecated - new concept soon
+
 # AI Accel API Platform
 
 An AI-accelerated Python backend that auto-selects CUDA/MPS/CPU, uses pgvector for ANN search, and serves a FastAPI REST API (with optional gRPC). It includes Redis-backed tasks, Prometheus metrics, and optional OpenTelemetry tracing.
